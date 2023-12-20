@@ -3,6 +3,7 @@ const morgan = require('morgan')
 const app = express()
 
 app.use(express.json())
+app.use(express.static('build'))
 
 morgan.token('body', function (req, res) { 
   if(req.method === 'POST') {
@@ -64,6 +65,24 @@ app.get('/api/persons/:id', (request, response) => {
   }
 })
 
+app.put('/api/persons/:id', (request, response) => {
+  const id = Number(request.params.id)
+  const person = persons.find(person => person.id === id)
+  
+  if (person) {
+    const body = request.body
+    const newPerson = {
+      ...person, 
+      name: body.name? body.name:person.name, 
+      number: body.number? body.number:person.number
+    }
+    persons = persons.map(person => person.id === id? newPerson : person)
+    response.json(newPerson)
+  } else {
+    response.status(404).end()
+  }
+})
+
 app.delete('/api/persons/:id', (request, response) => {
   const id = Number(request.params.id)
   persons = persons.filter(person => person.id !== id)
@@ -104,7 +123,7 @@ app.post('/api/persons', (request, response) => {
   response.json(person)
 })
 
-const PORT = 3001
+const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
