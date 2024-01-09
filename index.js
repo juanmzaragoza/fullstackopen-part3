@@ -10,18 +10,18 @@ const app = express()
 app.use(express.json())
 app.use(express.static('build'))
 
-morgan.token('body', function (req, res) { 
+morgan.token('body', function (req) {
   if(req.method === 'POST') {
-    return JSON.stringify(req.body) 
+    return JSON.stringify(req.body)
   } else{
-    return 
+    return
   }
 })
 
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
 app.get('/info', (request, response, next) => {
-  const date = new Date();
+  const date = new Date()
   Person.find({})
     .then(persons => response.send(`<p>Phonebook has info for ${persons.length} people</p><p>${date}</p>`))
     .catch(error => next(error))
@@ -43,7 +43,7 @@ app.get('/api/persons/:id', (request, response, next) => {
       }
     })
     .catch(error => {
-      console.error("error", error)
+      console.error('error', error)
       next(error)
     })
 })
@@ -56,7 +56,7 @@ app.put('/api/persons/:id', (request, response, next) => {
   }
   Person.findByIdAndUpdate(request.params.id, updatePerson, { new: true, runValidators: true })
     .then(result => {
-      console.log("result: ", result)
+      console.log('result: ', result)
       response.json(result)
     })
     .catch((error) => next(error))
